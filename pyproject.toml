@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spread-analytics-app"
+version = "0.1.0"
+description = "Streamlit dashboard for exploring online spread analytics data."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "bkprops" }]
+dependencies = [
+    "matplotlib==3.9.2",
+    "pandas==2.2.1",
+    "streamlit==1.39.0",
+]
+
+[project.urls]
+Repository = "https://github.com/bkprops/spread-analytics-app"
+
+[tool.setuptools.packages.find]
+include = ["spread_analytics"]
