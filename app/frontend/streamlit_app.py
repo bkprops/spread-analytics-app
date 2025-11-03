@@ -8,12 +8,8 @@ from typing import Any, Dict, List, Optional
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
-from spread_analytics import (
-    DEFAULT_SHEET_URL,
-    apply_filters,
-    build_cumulative_frame,
-    load_online_spread_dataset,
-)
+
+from spread_analytics import apply_filters, build_cumulative_frame, load_online_spread_dataset  # noqa: E402
 
 BACKGROUND_COLOR = "#1a1d2e"
 AXES_COLOR = "#FFFFFF"
