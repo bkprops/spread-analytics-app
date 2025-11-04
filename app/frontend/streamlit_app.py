@@ -291,11 +291,11 @@ def main() -> None:
     )
     col_start_date, col_end_date = st.sidebar.columns(2)
     start_date_input = col_start_date.text_input(
-        "Start date (YYYY-MM-DD)",
+        "Start date",
         value=start_date_default,
     )
     end_date_input = col_end_date.text_input(
-        "End date (YYYY-MM-DD)",
+        "End date",
         value=default_end,
     )
     selected_bet_types: List[str] = []
