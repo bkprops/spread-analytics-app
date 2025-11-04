@@ -168,13 +168,37 @@ def render_summary(metrics: Dict[str, float]) -> None:
     col_units.metric("Units Returned", f"{total_result:.2f}")
 
     roi_display = f"{roi:.2f}%"
-    roi_color = "#0CCE6B" if roi >= 0 else "#E84545"
-    roi_background = "rgba(12, 206, 107, 0.18)" if roi >= 0 else "rgba(232, 69, 69, 0.18)"
+    roi_positive = roi >= 0
+    roi_color = "#0CCE6B" if roi_positive else "#E84545"
+    roi_background = (
+        "rgba(12, 206, 107, 0.18)" if roi_positive else "rgba(232, 69, 69, 0.18)"
+    )
     col_roi.markdown(
         f"""
-        <div style="background-color:{roi_background};padding:12px;border-radius:10px;text-align:center;">
-            <div style="font-size:14px;color:#d2d6ee;font-weight:600;">ROI</div>
-            <div style="font-size:22px;font-weight:700;color:{roi_color};">{roi_display}</div>
+        <div style="
+            background-color:{roi_background};
+            padding:14px 12px;
+            border-radius:10px;
+            text-align:center;
+        ">
+            <div style="
+                font-size:16px;
+                font-weight:600;
+                color:#d2d6ee;
+                font-family:inherit;
+                margin-bottom:2px;
+            ">
+                ROI
+            </div>
+            <div style="
+                font-size:28px;
+                font-weight:600;
+                color:{roi_color};
+                font-family:inherit;
+                line-height:1.1;
+            ">
+                {roi_display}
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
