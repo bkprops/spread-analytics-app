@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -257,7 +258,16 @@ def main() -> None:
 
     logo_path = Path(__file__).resolve().parents[2] / "telegram_logo.png"
     if logo_path.exists():
-        st.sidebar.image(str(logo_path), use_column_width=True)
+        logo_bytes = logo_path.read_bytes()
+        logo_base64 = base64.b64encode(logo_bytes).decode("utf-8")
+        st.sidebar.markdown(
+            f"""
+            <div style="display:flex;justify-content:center;padding:8px 0;">
+              <img src="data:image/png;base64,{logo_base64}" style="width:50%;border:2px solid #ffffff;border-radius:12px;">
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     st.sidebar.header("Filters")
     selected_leagues = st.sidebar.multiselect(
