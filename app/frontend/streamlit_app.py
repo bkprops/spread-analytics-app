@@ -303,7 +303,7 @@ def main() -> None:
         "Units limit (stake ≥)",
         min_value=0.0,
         step=0.25,
-        value=0.0,
+        value=0.5,
         help="Only include bets with stake greater than or equal to this value.",
     )
     start_date_input = st.sidebar.text_input(
