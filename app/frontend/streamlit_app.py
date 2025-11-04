@@ -101,10 +101,21 @@ def plot_cumulative_chart(cumulative_df: pd.DataFrame) -> None:
 
     plt.rcParams.update(
         {
-            "font.family": "DejaVu Sans",
-            "font.size": 12,
+            "font.family": "sans-serif",
+            "font.sans-serif": [
+                "Inter",
+                "Segoe UI",
+                "Helvetica Neue",
+                "Helvetica",
+                "Arial",
+                "sans-serif",
+            ],
             "axes.spines.top": False,
             "axes.spines.right": False,
+            "axes.titlesize": 11,
+            "axes.labelsize": 9,
+            "xtick.labelsize": 8,
+            "ytick.labelsize": 8,
         }
     )
 
@@ -133,41 +144,100 @@ def plot_cumulative_chart(cumulative_df: pd.DataFrame) -> None:
 
     ax.axhline(y=0, color=NEUTRAL_COLOR, linestyle="--", alpha=0.7, linewidth=2)
 
-    ax.set_xlabel("Bet Number", fontweight="bold", fontsize=12, color=AXES_COLOR)
-    ax.set_ylabel("Units", fontweight="bold", fontsize=12, color=AXES_COLOR)
+    ax.set_xlabel("Bets placed", fontweight="semibold", fontsize=9, color=AXES_COLOR)
+    ax.set_ylabel("Units", fontweight="semibold", fontsize=9, color=AXES_COLOR)
 
-    ax.grid(False)
+    ax.grid(
+        True,
+        axis="y",
+        color=NEUTRAL_COLOR,
+        linestyle=":",
+        linewidth=0.6,
+        alpha=0.35,
+    )
     ax.spines["left"].set_color(AXES_COLOR)
     ax.spines["bottom"].set_color(AXES_COLOR)
-    ax.tick_params(axis="x", colors=AXES_COLOR)
-    ax.tick_params(axis="y", colors=AXES_COLOR)
+    ax.tick_params(axis="x", colors=AXES_COLOR, labelsize=8)
+    ax.tick_params(axis="y", colors=AXES_COLOR, labelsize=8)
 
     legend = ax.legend(
         loc="upper left",
         frameon=True,
         fancybox=True,
-        shadow=True,
-        fontsize=10,
+        shadow=False,
+        fontsize=6.75,
+        borderpad=0.45,
+        handlelength=1.95,
     )
-    legend.get_frame().set_facecolor("white")
-    legend.get_frame().set_alpha(0.85)
+    legend.get_frame().set_facecolor("#f5f5f5")
+    legend.get_frame().set_alpha(0.8)
 
     st.pyplot(fig, use_container_width=True)
 
 
 def render_summary(metrics: Dict[str, float]) -> None:
     """Display key metrics cards for the selected filters."""
+    st.markdown(
+        """
+        <style>
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .summary-grid__cell {
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .summary-grid__label,
+        .summary-grid__value {
+            font-size: 1.45rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.15;
+        }
+        .summary-grid__label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
     st.subheader("Summary")
     total_bets = metrics.get("total_bets", 0)
     total_result = metrics.get("total_result", 0.0)
     total_stake = metrics.get("total_stake", 0.0)
     roi = metrics.get("roi", 0.0)
 
-    col_bets, col_stake, col_units, col_roi = st.columns(4)
-    col_bets.metric("Bets", str(total_bets))
-    col_stake.metric("Units Staked", f"{total_stake:.2f}")
-    col_units.metric("Units Returned", f"{total_result:.2f}")
-    col_roi.metric("ROI", f"{roi:.2f}%")
+    st.markdown(
+        f"""
+        <div class="summary-grid">
+            <div class="summary-grid__cell">
+                <p class="summary-grid__label">Bets</p>
+                <p class="summary-grid__value">{total_bets}</p>
+            </div>
+            <div class="summary-grid__cell">
+                <p class="summary-grid__label">Units Staked</p>
+                <p class="summary-grid__value">{total_stake:.2f}</p>
+            </div>
+            <div class="summary-grid__cell">
+                <p class="summary-grid__label">Units Returned</p>
+                <p class="summary-grid__value">{total_result:.2f}</p>
+            </div>
+            <div class="summary-grid__cell">
+                <p class="summary-grid__label">ROI</p>
+                <p class="summary-grid__value">{roi:.2f}%</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_table(filtered_df: pd.DataFrame) -> None:
