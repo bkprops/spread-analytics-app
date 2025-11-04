@@ -166,7 +166,19 @@ def render_summary(metrics: Dict[str, float]) -> None:
     col_bets.metric("Bets", str(total_bets))
     col_stake.metric("Units Staked", f"{total_stake:.2f}")
     col_units.metric("Units Returned", f"{total_result:.2f}")
-    col_roi.metric("ROI", f"{roi:.2f}%")
+
+    roi_display = f"{roi:.2f}%"
+    roi_color = "#0CCE6B" if roi >= 0 else "#E84545"
+    roi_background = "rgba(12, 206, 107, 0.18)" if roi >= 0 else "rgba(232, 69, 69, 0.18)"
+    col_roi.markdown(
+        f"""
+        <div style="background-color:{roi_background};padding:12px;border-radius:10px;text-align:center;">
+            <div style="font-size:14px;color:#d2d6ee;font-weight:600;">ROI</div>
+            <div style="font-size:22px;font-weight:700;color:{roi_color};">{roi_display}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_table(filtered_df: pd.DataFrame) -> None:
