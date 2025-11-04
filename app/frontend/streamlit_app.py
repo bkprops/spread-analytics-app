@@ -295,39 +295,38 @@ def main() -> None:
     end_date_default_key = "end_date_default"
     current_season_key = "current_season_toggle"
     if start_date_key not in st.session_state:
-        st.session_state[start_date_key] = start_date_default
+        st.session_state[start_date_key] = start_date_default or ""
     if end_date_key not in st.session_state:
-        st.session_state[end_date_key] = default_end
+        st.session_state[end_date_key] = default_end or ""
     if end_date_default_key not in st.session_state:
-        st.session_state[end_date_default_key] = default_end
+        st.session_state[end_date_default_key] = default_end or ""
     if current_season_key not in st.session_state:
         st.session_state[current_season_key] = False
     if st.session_state[current_season_key]:
         st.session_state[start_date_key] = CURRENT_SEASON_START_DATE
     elif st.session_state[start_date_key] == CURRENT_SEASON_START_DATE:
-        st.session_state[start_date_key] = start_date_default
-    if st.session_state[end_date_default_key] != default_end:
-        previous_default = st.session_state[end_date_default_key]
-        if st.session_state[end_date_key] in ("", previous_default):
-            st.session_state[end_date_key] = default_end
-        st.session_state[end_date_default_key] = default_end
+        st.session_state[start_date_key] = start_date_default or ""
+    previous_default = st.session_state[end_date_default_key]
+    if previous_default != (default_end or ""):
+        current_end_value = st.session_state[end_date_key]
+        if current_end_value in ("", previous_default):
+            st.session_state[end_date_key] = default_end or ""
+        st.session_state[end_date_default_key] = default_end or ""
     col_start_date, col_end_date = st.sidebar.columns(2)
     col_start_date.text_input(
-        "Start date",
+        "Start date (YYYY-MM-DD)",
         key=start_date_key,
-        value=st.session_state[start_date_key],
     )
     col_end_date.text_input(
-        "End date",
+        "End date (YYYY-MM-DD)",
         key=end_date_key,
-        value=st.session_state[end_date_key],
     )
     st.sidebar.checkbox(
         "Current season",
         key=current_season_key,
     )
-    start_date_input = st.session_state[start_date_key]
-    end_date_input = st.session_state[end_date_key]
+    start_date_input = (st.session_state[start_date_key] or "").strip()
+    end_date_input = (st.session_state[end_date_key] or "").strip()
     selected_bet_types: List[str] = []
     selected_line_types: List[str] = []
     with st.sidebar.expander("Additional filters", expanded=False):
