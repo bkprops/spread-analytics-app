@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import matplotlib.pyplot as plt
@@ -253,6 +254,10 @@ def main() -> None:
     date_range = filters.get("date_range", {})
     default_start = date_range.get("min") or ""
     default_end = date_range.get("max") or ""
+
+    logo_path = Path(__file__).resolve().parents[2] / "telegram_logo.png"
+    if logo_path.exists():
+        st.sidebar.image(str(logo_path), use_column_width=True)
 
     st.sidebar.header("Filters")
     selected_leagues = st.sidebar.multiselect(
