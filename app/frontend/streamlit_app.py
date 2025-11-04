@@ -282,14 +282,27 @@ def main() -> None:
         default=[],
         placeholder="Leave empty to include all markets.",
     )
-    min_stake_value = st.sidebar.number_input(
-        "Units limit (stake ≥)",
-        min_value=0.0,
-        step=0.25,
-        value=0.5,
-        format="%.2f",
-        help="Only include bets with stake greater than or equal to this value.",
+    min_stake_key = "min_stake_value"
+    if min_stake_key not in st.session_state:
+        st.session_state[min_stake_key] = 0.5
+    st.sidebar.markdown("**Units limit (stake ≥)**")
+    stake_col_dec, stake_col_display, stake_col_inc = st.sidebar.columns([1, 2, 1])
+    if stake_col_dec.button("-", key="min_stake_decrement"):
+        st.session_state[min_stake_key] = max(
+            0.0, round(st.session_state[min_stake_key] - 0.25, 2)
+        )
+    if stake_col_inc.button("+", key="min_stake_increment"):
+        st.session_state[min_stake_key] = round(
+            st.session_state[min_stake_key] + 0.25, 2
+        )
+    stake_col_display.markdown(
+        f"<div style='text-align:center;font-size:1.25rem;font-weight:600;padding-top:4px;'>{st.session_state[min_stake_key]:.2f}</div>",
+        unsafe_allow_html=True,
     )
+    st.sidebar.caption(
+        "Only include bets with stake greater than or equal to this value."
+    )
+    min_stake_value = st.session_state[min_stake_key]
     start_date_key = "start_date_input"
     end_date_key = "end_date_input"
     end_date_default_key = "end_date_default"
