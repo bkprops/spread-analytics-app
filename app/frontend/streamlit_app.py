@@ -292,25 +292,35 @@ def main() -> None:
     )
     start_date_key = "start_date_input"
     end_date_key = "end_date_input"
+    end_date_default_key = "end_date_default"
     current_season_key = "current_season_toggle"
     if start_date_key not in st.session_state:
         st.session_state[start_date_key] = start_date_default
     if end_date_key not in st.session_state:
         st.session_state[end_date_key] = default_end
+    if end_date_default_key not in st.session_state:
+        st.session_state[end_date_default_key] = default_end
     if current_season_key not in st.session_state:
         st.session_state[current_season_key] = False
     if st.session_state[current_season_key]:
         st.session_state[start_date_key] = CURRENT_SEASON_START_DATE
     elif st.session_state[start_date_key] == CURRENT_SEASON_START_DATE:
         st.session_state[start_date_key] = start_date_default
+    if st.session_state[end_date_default_key] != default_end:
+        previous_default = st.session_state[end_date_default_key]
+        if st.session_state[end_date_key] in ("", previous_default):
+            st.session_state[end_date_key] = default_end
+        st.session_state[end_date_default_key] = default_end
     col_start_date, col_end_date = st.sidebar.columns(2)
     col_start_date.text_input(
         "Start date",
         key=start_date_key,
+        value=st.session_state[start_date_key],
     )
     col_end_date.text_input(
         "End date",
         key=end_date_key,
+        value=st.session_state[end_date_key],
     )
     st.sidebar.checkbox(
         "Current season",
