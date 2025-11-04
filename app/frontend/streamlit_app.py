@@ -132,13 +132,6 @@ def plot_cumulative_chart(cumulative_df: pd.DataFrame) -> None:
 
     ax.axhline(y=0, color=NEUTRAL_COLOR, linestyle="--", alpha=0.7, linewidth=2)
 
-    ax.set_title(
-        "Cumulative Profit",
-        fontweight="bold",
-        color=AXES_COLOR,
-        fontsize=14,
-        pad=20,
-    )
     ax.set_xlabel("Bet Number", fontweight="bold", fontsize=12, color=AXES_COLOR)
     ax.set_ylabel("Units", fontweight="bold", fontsize=12, color=AXES_COLOR)
 
@@ -169,10 +162,10 @@ def render_summary(metrics: Dict[str, float]) -> None:
     total_stake = metrics.get("total_stake", 0.0)
     roi = metrics.get("roi", 0.0)
 
-    col_bets, col_units, col_stake, col_roi = st.columns(4)
+    col_bets, col_stake, col_units, col_roi = st.columns(4)
     col_bets.metric("Bets", str(total_bets))
-    col_units.metric("Total Units", f"{total_result:.2f}")
-    col_stake.metric("Total Stake", f"{total_stake:.2f}")
+    col_stake.metric("Units Staked", f"{total_stake:.2f}")
+    col_units.metric("Units Returned", f"{total_result:.2f}")
     col_roi.metric("ROI", f"{roi:.2f}%")
 
 
