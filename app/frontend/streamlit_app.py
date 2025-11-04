@@ -217,11 +217,11 @@ def render_table(filtered_df: pd.DataFrame) -> None:
 def main() -> None:
     """Entry point for the Streamlit dashboard."""
     st.set_page_config(
-        page_title="Online Spread Dashboard",
+        page_title="Online Spread Analytics Dashboard",
         page_icon="📊",
         layout="wide",
     )
-    st.title("Online Spread Dashboard")
+    st.title("Online Spread Analytics Dashboard")
 
     try:
         dataset = get_dataset(os.getenv("ONLINE_SPREAD_SHEET_URL"))
