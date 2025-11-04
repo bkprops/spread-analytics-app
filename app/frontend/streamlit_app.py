@@ -255,28 +255,23 @@ def main() -> None:
     default_end = date_range.get("max") or ""
 
     st.sidebar.header("Filters")
-    excluded_leagues = {"MLS", "Brasileiro Serie A"}
-    default_leagues = [
-        league for league in league_options if league not in excluded_leagues
-    ]
     selected_leagues = st.sidebar.multiselect(
         "Leagues",
         options=league_options,
-        default=default_leagues or league_options,
+        default=[],
+        placeholder="Leave empty to include all leagues.",
     )
     selected_bookmakers = st.sidebar.multiselect(
         "Bookmakers",
         options=bookmaker_options,
-        default=bookmaker_options,
+        default=[],
+        placeholder="Leave empty to include all bookmakers.",
     )
-    excluded_markets = {"Possession", "Corners", "Shots on target"}
-    default_markets = [
-        market for market in market_options if market not in excluded_markets
-    ]
     selected_markets = st.sidebar.multiselect(
         "Markets",
         options=market_options,
-        default=default_markets or market_options,
+        default=[],
+        placeholder="Leave empty to include all markets.",
     )
     selected_bet_types: List[str] = []
     selected_line_types: List[str] = []
@@ -317,45 +312,41 @@ def main() -> None:
     min_stake_param = min_stake_value if min_stake_value > 0 else None
     start_date_param = start_date_input.strip() or None
     end_date_param = end_date_input.strip() or None
-    show_results = st.sidebar.button("Display results")
 
-    if show_results:
-        working_df = apply_filters(
-            dataset,
-            selected_leagues or None,
-            selected_bookmakers or None,
-            selected_markets or None,
-            min_stake_param,
-            start_date_param,
-            end_date_param,
-            selected_bet_types or None,
-            selected_line_types or None,
+    working_df = apply_filters(
+        dataset,
+        selected_leagues or None,
+        selected_bookmakers or None,
+        selected_markets or None,
+        min_stake_param,
+        start_date_param,
+        end_date_param,
+        selected_bet_types or None,
+        selected_line_types or None,
+    )
+    metrics = calculate_metrics(working_df)
+    render_summary(metrics)
+
+    cumulative_input = working_df.dropna(subset=["Date", "Result", "Stake"])
+    cumulative_df = build_cumulative_frame(cumulative_input)
+    if not cumulative_df.empty:
+        cumulative_df["bet_number"] = pd.to_numeric(
+            cumulative_df["bet_number"], errors="coerce"
         )
-        metrics = calculate_metrics(working_df)
-        render_summary(metrics)
+        cumulative_df["cumulative_result"] = pd.to_numeric(
+            cumulative_df["cumulative_result"], errors="coerce"
+        )
+        cumulative_df["flat_cumulative"] = pd.to_numeric(
+            cumulative_df["flat_cumulative"], errors="coerce"
+        )
+        cumulative_df = cumulative_df.dropna(
+            subset=["bet_number", "cumulative_result", "flat_cumulative"]
+        )
 
-        cumulative_input = working_df.dropna(subset=["Date", "Result", "Stake"])
-        cumulative_df = build_cumulative_frame(cumulative_input)
-        if not cumulative_df.empty:
-            cumulative_df["bet_number"] = pd.to_numeric(
-                cumulative_df["bet_number"], errors="coerce"
-            )
-            cumulative_df["cumulative_result"] = pd.to_numeric(
-                cumulative_df["cumulative_result"], errors="coerce"
-            )
-            cumulative_df["flat_cumulative"] = pd.to_numeric(
-                cumulative_df["flat_cumulative"], errors="coerce"
-            )
-            cumulative_df = cumulative_df.dropna(
-                subset=["bet_number", "cumulative_result", "flat_cumulative"]
-            )
+    plot_cumulative_chart(cumulative_df)
 
-        plot_cumulative_chart(cumulative_df)
-
-        st.subheader("Selections")
-        render_table(working_df)
-    else:
-        st.info("Select filters and click 'Display results' to view metrics and charts.")
+    st.subheader("Selections")
+    render_table(working_df)
 
 
 if __name__ == "__main__":
