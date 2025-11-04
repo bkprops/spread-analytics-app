@@ -230,7 +230,22 @@ def main() -> None:
         return
 
     filters = build_filter_cache(dataset)
-    league_options = filters.get("leagues", [])
+    league_order = [
+        "Premier League",
+        "La Liga",
+        "Serie A",
+        "Bundesliga",
+        "Ligue 1",
+        "Championship",
+        "Eredivisie",
+        "Scottish Premiership",
+        "Brasileiro Serie A",
+        "MLS",
+    ]
+    raw_leagues = filters.get("leagues", [])
+    league_options = [
+        league for league in league_order if league in raw_leagues
+    ] + sorted({league for league in raw_leagues if league not in league_order})
     bookmaker_options = filters.get("bookmakers", [])
     market_options = filters.get("markets", [])
     bet_type_options = filters.get("bet_types", [])
