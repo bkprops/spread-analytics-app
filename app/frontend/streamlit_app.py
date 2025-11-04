@@ -288,7 +288,7 @@ def main() -> None:
         step=0.25,
         value=0.5,
         format="%.2f",
-        help="Only include bets with stake greater than or equal to this value (use . as decimal separator).",
+        help="Only include bets with stake greater than or equal to this value.",
     )
     start_date_key = "start_date_input"
     end_date_key = "end_date_input"
