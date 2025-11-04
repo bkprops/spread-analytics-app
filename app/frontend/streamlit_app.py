@@ -281,6 +281,22 @@ def main() -> None:
         default=[],
         placeholder="Leave empty to include all markets.",
     )
+    min_stake_value = st.sidebar.number_input(
+        "Units limit (stake ≥)",
+        min_value=0.0,
+        step=0.25,
+        value=0.5,
+        format="%.2f",
+        help="Only include bets with stake greater than or equal to this value (use . as decimal separator).",
+    )
+    start_date_input = st.sidebar.text_input(
+        "Start date (YYYY-MM-DD)",
+        value=default_start,
+    )
+    end_date_input = st.sidebar.text_input(
+        "End date (YYYY-MM-DD)",
+        value=default_end,
+    )
     selected_bet_types: List[str] = []
     selected_line_types: List[str] = []
     with st.sidebar.expander("Additional filters", expanded=False):
@@ -302,22 +318,6 @@ def main() -> None:
                     key=f"line_type_{option_key}",
                 ):
                     selected_line_types.append(option)
-    min_stake_value = st.sidebar.number_input(
-        "Units limit (stake ≥)",
-        min_value=0.0,
-        step=0.25,
-        value=0.5,
-        format="%.2f",
-        help="Only include bets with stake greater than or equal to this value (use . as decimal separator).",
-    )
-    start_date_input = st.sidebar.text_input(
-        "Start date (YYYY-MM-DD)",
-        value=default_start,
-    )
-    end_date_input = st.sidebar.text_input(
-        "End date (YYYY-MM-DD)",
-        value=default_end,
-    )
     min_stake_param = min_stake_value if min_stake_value > 0 else None
     start_date_param = start_date_input.strip() or None
     end_date_param = end_date_input.strip() or None
