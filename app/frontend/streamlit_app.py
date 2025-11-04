@@ -18,6 +18,7 @@ AXES_COLOR = "#FFFFFF"
 COLOR_ACTUAL = "#FF8A3D"
 COLOR_FLAT = "#FF4FA0"
 NEUTRAL_COLOR = "#B0B7C3"
+CURRENT_SEASON_START_DATE = "2025-09-13"
 
 
 @st.cache_data(show_spinner=True)
@@ -246,8 +247,8 @@ def main() -> None:
     bet_type_options = filters.get("bet_types", [])
     line_type_options = filters.get("line_types", [])
     date_range = filters.get("date_range", {})
+    start_date_default = date_range.get("min") or ""
     default_end = date_range.get("max") or ""
-    start_date_default = "2025-09-13"
 
     logo_path = Path(__file__).resolve().parents[2] / "telegram_logo.png"
     if logo_path.exists():
@@ -289,15 +290,31 @@ def main() -> None:
         format="%.2f",
         help="Only include bets with stake greater than or equal to this value (use . as decimal separator).",
     )
+    start_date_key = "start_date_input"
+    if start_date_key not in st.session_state:
+        st.session_state[start_date_key] = start_date_default
+    end_date_key = "end_date_input"
+    if end_date_key not in st.session_state:
+        st.session_state[end_date_key] = default_end
     col_start_date, col_end_date = st.sidebar.columns(2)
-    start_date_input = col_start_date.text_input(
-        "Start date",
-        value=start_date_default,
+    col_start_date.text_input(
+        "Start date (YYYY-MM-DD)",
+        key=start_date_key,
     )
-    end_date_input = col_end_date.text_input(
-        "End date",
-        value=default_end,
+    col_end_date.text_input(
+        "End date (YYYY-MM-DD)",
+        key=end_date_key,
     )
+    current_season_selected = st.sidebar.checkbox(
+        "Current season",
+        key="current_season_toggle",
+    )
+    if current_season_selected:
+        st.session_state[start_date_key] = CURRENT_SEASON_START_DATE
+    elif st.session_state[start_date_key] == CURRENT_SEASON_START_DATE:
+        st.session_state[start_date_key] = start_date_default
+    start_date_input = st.session_state[start_date_key]
+    end_date_input = st.session_state[end_date_key]
     selected_bet_types: List[str] = []
     selected_line_types: List[str] = []
     with st.sidebar.expander("Additional filters", expanded=False):
