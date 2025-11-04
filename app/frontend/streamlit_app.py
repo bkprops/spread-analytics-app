@@ -298,11 +298,11 @@ def main() -> None:
         st.session_state[end_date_key] = default_end
     col_start_date, col_end_date = st.sidebar.columns(2)
     col_start_date.text_input(
-        "Start date (YYYY-MM-DD)",
+        "Start date",
         key=start_date_key,
     )
     col_end_date.text_input(
-        "End date (YYYY-MM-DD)",
+        "End date",
         key=end_date_key,
     )
     current_season_selected = st.sidebar.checkbox(
