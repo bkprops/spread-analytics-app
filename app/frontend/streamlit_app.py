@@ -263,7 +263,7 @@ def main() -> None:
         st.sidebar.markdown(
             f"""
             <div style="display:flex;justify-content:center;padding:8px 0;">
-              <img src="data:image/png;base64,{logo_base64}" style="width:50%;border:2px solid #ffffff;border-radius:12px;">
+              <img src="data:image/png;base64,{logo_base64}" style="width:50%;border:2px solid #ffffff;border-radius:50%;box-shadow:0 0 4px rgba(0,0,0,0.25);">
             </div>
             """,
             unsafe_allow_html=True,
