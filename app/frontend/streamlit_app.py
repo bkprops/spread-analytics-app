@@ -246,8 +246,8 @@ def main() -> None:
     bet_type_options = filters.get("bet_types", [])
     line_type_options = filters.get("line_types", [])
     date_range = filters.get("date_range", {})
-    default_start = date_range.get("min") or ""
     default_end = date_range.get("max") or ""
+    start_date_default = "2025-09-13"
 
     logo_path = Path(__file__).resolve().parents[2] / "telegram_logo.png"
     if logo_path.exists():
@@ -287,13 +287,14 @@ def main() -> None:
         step=0.25,
         value=0.5,
         format="%.2f",
-        help="Only include bets with stake greater than or equal to this value",
+        help="Only include bets with stake greater than or equal to this value (use . as decimal separator).",
     )
-    start_date_input = st.sidebar.text_input(
+    col_start_date, col_end_date = st.sidebar.columns(2)
+    start_date_input = col_start_date.text_input(
         "Start date (YYYY-MM-DD)",
-        value=default_start,
+        value=start_date_default,
     )
-    end_date_input = st.sidebar.text_input(
+    end_date_input = col_end_date.text_input(
         "End date (YYYY-MM-DD)",
         value=default_end,
     )
