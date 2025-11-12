@@ -93,6 +93,81 @@ def calculate_metrics(df: pd.DataFrame) -> Dict[str, float]:
     }
 
 
+def build_minimum_unit_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """Return cumulative metrics for each minimum stake threshold."""
+    empty_columns = [
+        "Minimum Unit",
+        "Bets",
+        "Units Staked",
+        "Units Returned",
+        "ROI",
+    ]
+    if df.empty or "Stake" not in df.columns:
+        return pd.DataFrame(columns=empty_columns)
+
+    stake_values = df["Stake"].dropna().astype(float)
+    if stake_values.empty:
+        return pd.DataFrame(columns=empty_columns)
+
+    thresholds = sorted(
+        {round(float(value), 2) for value in stake_values if float(value) >= 0.0}
+    )
+    summary_rows = []
+    for threshold in thresholds:
+        tier_df = df[df["Stake"].fillna(0.0) >= threshold]
+        if tier_df.empty:
+            continue
+        metrics = calculate_metrics(tier_df)
+        summary_rows.append(
+            {
+                "Minimum Unit": round(threshold, 2),
+                "Bets": metrics["total_bets"],
+                "Units Staked": metrics["total_stake"],
+                "Units Returned": metrics["total_result"],
+                "ROI": metrics["roi"],
+            }
+        )
+
+    return pd.DataFrame(summary_rows, columns=empty_columns)
+
+
+def render_minimum_unit_table(df: pd.DataFrame) -> None:
+    """Display metrics for each minimum unit threshold."""
+    min_unit_summary = build_minimum_unit_summary(df)
+    st.subheader("Results by Minimum Unit")
+    if min_unit_summary.empty:
+        st.info("No data available to build the minimum units table.")
+        return
+
+    display_summary = min_unit_summary.copy()
+    display_summary["Minimum Unit"] = display_summary["Minimum Unit"].map(
+        lambda value: f"{value:.2f} u"
+    )
+    display_summary["Bets"] = display_summary["Bets"].map(lambda value: f"{value:d}")
+    display_summary["Units Staked"] = display_summary["Units Staked"].map(
+        lambda value: f"{value:.2f}"
+    )
+    display_summary["Units Returned"] = display_summary["Units Returned"].map(
+        lambda value: f"{value:.2f}"
+    )
+    display_summary["ROI"] = display_summary["ROI"].map(
+        lambda value: f"{value:.2f}%"
+    )
+
+    st.dataframe(
+        display_summary,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "Minimum Unit": st.column_config.TextColumn("Minimum Unit"),
+            "Bets": st.column_config.TextColumn("Bets"),
+            "Units Staked": st.column_config.TextColumn("Units Staked"),
+            "Units Returned": st.column_config.TextColumn("Units Returned"),
+            "ROI": st.column_config.TextColumn("ROI"),
+        },
+    )
+
+
 def plot_cumulative_chart(cumulative_df: pd.DataFrame) -> None:
     """Render cumulative profits chart."""
     if cumulative_df.empty:
@@ -422,17 +497,25 @@ def main() -> None:
     start_date_param = start_date_input.strip() or None
     end_date_param = end_date_input.strip() or None
 
-    working_df = apply_filters(
+    filtered_without_min_stake = apply_filters(
         dataset,
         selected_leagues or None,
         selected_bookmakers or None,
         selected_markets or None,
-        min_stake_param,
+        None,
         start_date_param,
         end_date_param,
         selected_bet_types or None,
         selected_line_types or None,
     )
+
+    if min_stake_param is not None:
+        working_df = filtered_without_min_stake[
+            filtered_without_min_stake["Stake"].fillna(0.0) >= float(min_stake_param)
+        ]
+    else:
+        working_df = filtered_without_min_stake
+
     metrics = calculate_metrics(working_df)
     render_summary(metrics)
 
@@ -453,6 +536,8 @@ def main() -> None:
         )
 
     plot_cumulative_chart(cumulative_df)
+
+    render_minimum_unit_table(filtered_without_min_stake)
 
     st.subheader("Selections")
     render_table(working_df)
