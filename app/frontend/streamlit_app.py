@@ -131,6 +131,144 @@ def build_minimum_unit_summary(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(summary_rows, columns=empty_columns)
 
 
+def build_league_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate metrics by league."""
+    empty_columns = [
+        "League",
+        "Bets",
+        "Units Staked",
+        "Units Returned",
+        "ROI",
+    ]
+    if df.empty or "League" not in df.columns:
+        return pd.DataFrame(columns=empty_columns)
+
+    summary_rows = []
+    for league, group in df.groupby("League"):
+        if not isinstance(league, str) or not league.strip():
+            continue
+        metrics = calculate_metrics(group)
+        summary_rows.append(
+            {
+                "League": league,
+                "Bets": metrics["total_bets"],
+                "Units Staked": metrics["total_stake"],
+                "Units Returned": metrics["total_result"],
+                "ROI": metrics["roi"],
+            }
+        )
+
+    summary_df = pd.DataFrame(summary_rows, columns=empty_columns)
+    if summary_df.empty:
+        return summary_df
+    return summary_df.sort_values(
+        ["Bets", "League"], ascending=[False, True]
+    ).reset_index(drop=True)
+
+
+def render_league_table(df: pd.DataFrame) -> None:
+    """Display metrics for each league."""
+    league_summary = build_league_summary(df)
+    st.subheader("Results by League")
+    if league_summary.empty:
+        st.info("No leagues available for the current selection.")
+        return
+
+    display_summary = league_summary.copy()
+    display_summary["Bets"] = display_summary["Bets"].map(lambda value: f"{value:d}")
+    display_summary["Units Staked"] = display_summary["Units Staked"].map(
+        lambda value: f"{value:.2f}"
+    )
+    display_summary["Units Returned"] = display_summary["Units Returned"].map(
+        lambda value: f"{value:.2f}"
+    )
+    display_summary["ROI"] = display_summary["ROI"].map(
+        lambda value: f"{value:.2f}%"
+    )
+
+    st.dataframe(
+        display_summary,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "League": st.column_config.TextColumn("League"),
+            "Bets": st.column_config.TextColumn("Bets"),
+            "Units Staked": st.column_config.TextColumn("Units Staked"),
+            "Units Returned": st.column_config.TextColumn("Units Returned"),
+            "ROI": st.column_config.TextColumn("ROI"),
+        },
+    )
+
+
+def build_market_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate metrics by market."""
+    empty_columns = [
+        "Market",
+        "Bets",
+        "Units Staked",
+        "Units Returned",
+        "ROI",
+    ]
+    if df.empty or "Market" not in df.columns:
+        return pd.DataFrame(columns=empty_columns)
+
+    summary_rows = []
+    for market, group in df.groupby("Market"):
+        if not isinstance(market, str) or not market.strip():
+            continue
+        metrics = calculate_metrics(group)
+        summary_rows.append(
+            {
+                "Market": market,
+                "Bets": metrics["total_bets"],
+                "Units Staked": metrics["total_stake"],
+                "Units Returned": metrics["total_result"],
+                "ROI": metrics["roi"],
+            }
+        )
+
+    summary_df = pd.DataFrame(summary_rows, columns=empty_columns)
+    if summary_df.empty:
+        return summary_df
+    return summary_df.sort_values(
+        ["Bets", "Market"], ascending=[False, True]
+    ).reset_index(drop=True)
+
+
+def render_market_table(df: pd.DataFrame) -> None:
+    """Display metrics for each market."""
+    market_summary = build_market_summary(df)
+    st.subheader("Results by Market")
+    if market_summary.empty:
+        st.info("No markets available for the current selection.")
+        return
+
+    display_summary = market_summary.copy()
+    display_summary["Bets"] = display_summary["Bets"].map(lambda value: f"{value:d}")
+    display_summary["Units Staked"] = display_summary["Units Staked"].map(
+        lambda value: f"{value:.2f}"
+    )
+    display_summary["Units Returned"] = display_summary["Units Returned"].map(
+        lambda value: f"{value:.2f}"
+    )
+    display_summary["ROI"] = display_summary["ROI"].map(
+        lambda value: f"{value:.2f}%"
+    )
+
+    st.dataframe(
+        display_summary,
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "Market": st.column_config.TextColumn("Market"),
+            "Bets": st.column_config.TextColumn("Bets"),
+            "Units Staked": st.column_config.TextColumn("Units Staked"),
+            "Units Returned": st.column_config.TextColumn("Units Returned"),
+            "ROI": st.column_config.TextColumn("ROI"),
+        },
+    )
+
+
 def render_minimum_unit_table(df: pd.DataFrame) -> None:
     """Display metrics for each minimum unit threshold."""
     min_unit_summary = build_minimum_unit_summary(df)
@@ -537,6 +675,8 @@ def main() -> None:
 
     plot_cumulative_chart(cumulative_df)
 
+    render_league_table(working_df)
+    render_market_table(working_df)
     render_minimum_unit_table(filtered_without_min_stake)
 
     st.subheader("Selections")
